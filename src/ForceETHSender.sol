@@ -12,7 +12,7 @@ contract ForceETHSender is Ownable {
     receive() external payable {}
 
 
-    function ForceSend(address payable recipient) external {
+    function ForceSend(address payable recipient) external onlyOwner {
         require(address(this).balance > 0, "ForceETHSender -> function ForceSend: No ether to send");
 
         selfdestruct(recipient);
