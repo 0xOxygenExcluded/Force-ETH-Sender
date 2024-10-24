@@ -6,14 +6,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import {console} from "forge-std/Test.sol";
 
 
-contract ForceETHSenderWithHelper is Ownable {
+contract ForceETHSenderWithHelper{
     
-    constructor(address initialOwner) Ownable(initialOwner) {}
+    constructor() {}
 
 
-    function forceSend(address payable recipient) external payable onlyOwner {
-        SelfDestructHelper helper = new SelfDestructHelper();
-        helper.destruct{value: msg.value}(recipient);
+    function forceSend(address payable receiver) external payable {
+        (new SelfDestructHelper){value: msg.value}(receiver);
     }
 
 
@@ -23,10 +22,7 @@ contract ForceETHSenderWithHelper is Ownable {
 
 contract SelfDestructHelper {
 
-    constructor() {}
-
-    function destruct(address payable recipient) payable public {
-        require(address(this).balance > 0, "TESTForceETHSender -> SelfDestructHelper -> function destruct: No ether to send");
-        selfdestruct(recipient);
+    constructor(address payable receiver) payable {
+        selfdestruct(receiver);
     }
 }

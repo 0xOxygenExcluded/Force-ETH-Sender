@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
 import {ForceETHSenderWithHelper, SelfDestructHelper} from "../src/ForceETHSenderWithHelper.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract NonPayableContract {
@@ -24,7 +23,7 @@ contract ForceETHSenderWithHelperTest is Test {
         forkID = vm.createFork(MAINNET_URL);
         vm.selectFork(forkID);
 
-        sender = new ForceETHSenderWithHelper(owner);
+        sender = new ForceETHSenderWithHelper();
         vm.deal(owner, 3 ether);
     }
 
@@ -45,18 +44,5 @@ contract ForceETHSenderWithHelperTest is Test {
         vm.prank(owner);
         sender.forceSend{value: owner.balance}(payable(address(nonPayableContract)));
         assertEq(initialOwnerBalance, address(nonPayableContract).balance);
-    }
-
-
-    function test_RevertWhenForceSendCallerIsNotContractOwner() public {
-        NonPayableContract nonPayableContract = new NonPayableContract();
-
-        vm.startPrank(regularUser);
-        vm.expectRevert(abi.encodeWithSelector(
-                        Ownable.OwnableUnauthorizedAccount.selector,
-                        address(regularUser)));
-
-        sender.forceSend{value: regularUser.balance}(payable(address(nonPayableContract)));
-        vm.stopPrank();
     }
 }
