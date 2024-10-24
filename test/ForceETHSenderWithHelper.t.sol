@@ -30,18 +30,21 @@ contract ForceETHSenderWithHelperTest is Test {
 
 
     function test_SendEtherToUser() public {
+        uint256 initialOwnerBalance = owner.balance;
+
         vm.prank(owner);
         sender.forceSend{value: owner.balance}(regularUser);
-        assertTrue(regularUser.balance > 0);
+        assertEq(regularUser.balance, initialOwnerBalance);
     }
 
 
     function test_SendEtherToNonPayableContract() public {
         NonPayableContract nonPayableContract = new NonPayableContract();
+        uint256 initialOwnerBalance = owner.balance;
 
         vm.prank(owner);
         sender.forceSend{value: owner.balance}(payable(address(nonPayableContract)));
-        assertTrue(address(nonPayableContract).balance > 0);
+        assertEq(initialOwnerBalance, address(nonPayableContract).balance);
     }
 
 
